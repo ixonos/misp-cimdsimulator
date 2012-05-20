@@ -33,7 +33,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
 					req.getSequenceNumber());
 			for(Parameter p : req.getParameters()) {
 				if(p.getNumber() == Parameter.USER_IDENTITY) {
-					session.setAttributeIfAbsent("USER_ID", p.getValue());
+					session.setAttributeIfAbsent(SessionAttribute.USER_ID, p.getValue());
 					break;
 				}
 			}

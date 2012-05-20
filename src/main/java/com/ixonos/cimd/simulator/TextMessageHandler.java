@@ -46,7 +46,8 @@ public class TextMessageHandler extends IoHandlerAdapter {
 		String text = data[3];
 		
 		for(Map.Entry<Long, IoSession> se : cimdSessions.entrySet()) {
-			String sessionUserId = (String)se.getValue().getAttribute("USER_ID");
+			String sessionUserId = (String)se.getValue().getAttribute(SessionAttribute.USER_ID);
+			logger.debug("sessionUser: "+sessionUserId);
 			if(deliverToReceiverOnly && !receiverUid.equals(sessionUserId))
 				continue;
 

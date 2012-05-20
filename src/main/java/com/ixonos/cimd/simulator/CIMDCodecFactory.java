@@ -12,7 +12,7 @@ import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
 /**
  * A ProtocolCodecFactory implementation that serializes and deserializes CIMD protocol packets. 
  * 
- * @author aspluma
+ * @author Marko Asplund
  */
 public class CIMDCodecFactory implements ProtocolCodecFactory {
 	private CIMDPacketDecoder decoder;

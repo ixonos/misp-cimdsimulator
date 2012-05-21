@@ -43,7 +43,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
 			session.close(false);
 			break;
 		case Packet.OP_DELIVER_MESSAGE_RSP:
-			break;
+			return;
 		case Packet.OP_ALIVE:
 			res = new Packet(
 					req.getOperationCode() + 50,

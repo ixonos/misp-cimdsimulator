@@ -16,6 +16,14 @@ import com.ixonos.cimd.InvalidMessageFormatException;
 /**
  * Protocol handler that receives text messages in CSV format via socket and delivers them to CIMD applications.
  * Allows text messages to be injected into the CIMD server.
+ * Message format
+ * 
+ * <delivery count>,<receiver uid>,<destination address>,<origin address>,<message text>
+ *
+ * for example:
+ * 
+ * 1000,*,123,456,test33
+ * 1000,rlu,123,456,"hello, world"
  * 
  * @author Marko Asplund
  */

@@ -42,7 +42,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
 //			logger.info("Ending session with " + session.getRemoteAddress());
 			session.close(false);
 			break;
-		case Packet.OP_DELIVER_MESSAGE_RSP:
+		case CIMDConstants.OP_DELIVER_MESSAGE_RSP:
 			return;
 		case Packet.OP_ALIVE:
 			res = new Packet(

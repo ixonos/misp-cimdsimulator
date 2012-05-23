@@ -12,4 +12,8 @@ public class ContingencyException extends Exception {
 	  super(message);
   }
 
+	public ContingencyException(String message, Throwable cause) {
+		super(message, cause);
+  }
+
 }

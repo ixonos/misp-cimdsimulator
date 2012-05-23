@@ -12,4 +12,8 @@ public class InvalidMessageFormatException extends ContingencyException {
 	  super(message);
   }
 
+	public InvalidMessageFormatException(String message, Throwable cause) {
+		super(message, cause);
+  }
+
 }

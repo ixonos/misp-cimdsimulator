@@ -28,12 +28,14 @@ public class CIMDSimulator {
 		this.port = port;
 		this.messagePort = messagePort;
 		
+		// CIMD connection acceptor.
 		cimdAcceptor = new NioSocketAcceptor();
     cimdAcceptor.getFilterChain().addLast("logger", new LoggingFilter() );
     cimdAcceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new CIMDCodecFactory()));
 		CIMDMessageHandler handler = new CIMDMessageHandler();
 		cimdAcceptor.setHandler(handler);
     
+		// acceptor for injecting text messages into the CIMD server.
     msgAcceptor = new NioSocketAcceptor();
     msgAcceptor.getFilterChain().addLast("logger", new LoggingFilter() );
     msgAcceptor.getFilterChain().addLast("protocol",

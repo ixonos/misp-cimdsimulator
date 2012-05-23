@@ -55,6 +55,7 @@ public class TextMessageHandler extends IoHandlerAdapter {
 		private String receiverUid;
 		private String destination;
 		private String origin;
+		private String text;
 
 		public DeliveryRequest(Integer count, String receiverUid, String destination,
         String origin, String text) {
@@ -65,15 +66,13 @@ public class TextMessageHandler extends IoHandlerAdapter {
 	    this.text = text;
     }
 
-		private String text;
-		
 		public static DeliveryRequest parseMessage(String msg) throws InvalidMessageFormatException {
 			String[] data = null;
 			Integer count = null;
 			try {
 				data = csvParser.parseLine(msg);
-				if(data == null || data.length > 5)
-					throw new InvalidMessageFormatException("Expecting 4 field values: "+msg);
+				if(data == null || data.length != 5)
+					throw new InvalidMessageFormatException("Expecting 5 field values: "+msg);
 				if(data[1].length() == 0 || data[2].length() == 0 || data[4].length() == 0)
 					throw new InvalidMessageFormatException("Field values should be non-empty: "+msg);
 				count = Integer.valueOf(data[0]);

@@ -23,6 +23,7 @@ public class CIMDSimulator {
 	private int port;
 	private IoAcceptor msgAcceptor;
 	private int messagePort;
+	private static final String CHARSET = "ISO-8859-15";
 
 	public CIMDSimulator(int port, int messagePort) {
 		this.port = port;
@@ -39,7 +40,7 @@ public class CIMDSimulator {
     msgAcceptor = new NioSocketAcceptor();
     msgAcceptor.getFilterChain().addLast("logger", new LoggingFilter() );
     msgAcceptor.getFilterChain().addLast("protocol",
-    		new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+    		new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName(CHARSET))));
     TextMessageHandler textHandler = new TextMessageHandler(cimdAcceptor.getManagedSessions());
     msgAcceptor.setHandler(textHandler);
 	}

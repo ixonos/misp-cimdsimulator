@@ -11,7 +11,7 @@ import com.googlecode.jcimd.PacketSerializer;
 /**
  * A ProtocolDecoder which deserializes CIMD protocol packets. 
  * 
- * @author Marko Asplund
+ * @author Ixonos / Marko Asplund
  */
 public class CIMDPacketDecoder extends CumulativeProtocolDecoder {
 	private PacketSerializer serializer;

@@ -22,10 +22,12 @@ import com.ixonos.cimd.InvalidMessageFormatException;
  *
  * for example:
  * 
- * 1000,*,123,456,test33
- * 1000,rlu,123,456,"hello, world"
+ * 555,*,123,456,test33
+ * 1000,rlu,123,456,"hello, world #%d"
  * 
- * @author Marko Asplund
+ * %d in message content will be replaced with the current message count.
+ * 
+ * @author Ixonos / Marko Asplund
  */
 public class TextMessageHandler extends IoHandlerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(TextMessageHandler.class);
@@ -44,8 +46,8 @@ public class TextMessageHandler extends IoHandlerAdapter {
 		
 		List<IoSession> receivers = messageInjector.getSessions(msg.getReceiverUid());
 		for(int i = 0; i<msg.getCount(); i++) {
-			messageInjector.injectMessage(receivers, msg.getDestination(), msg.getOrigin(),
-					String.format("%s # %d", msg.getText(), i));
+			String text = msg.getText().replaceFirst("%d", String.valueOf(i));
+			messageInjector.injectMessage(receivers, msg.getDestination(), msg.getOrigin(), text);
 		}
 	}
 	

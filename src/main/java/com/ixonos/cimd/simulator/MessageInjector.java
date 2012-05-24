@@ -14,12 +14,18 @@ import org.slf4j.LoggerFactory;
 import com.googlecode.jcimd.Packet;
 import com.googlecode.jcimd.Parameter;
 import com.googlecode.jcimd.StringUserData;
+import com.googlecode.jcimd.TextMessageUserDataFactory;
+import com.googlecode.jcimd.UserData;
 
-
+/**
+ * Class for injecting text messages into the CIMD server sessions.
+ * 
+ * @author Ixonos / Marko Asplund
+ */
 public class MessageInjector {
-	@SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.getLogger(MessageInjector.class);
+	private static final Logger logger = LoggerFactory.getLogger(MessageInjector.class);
 	private Map<Long, IoSession> cimdSessions;
+	private static final boolean SKIP_ENCODE_MESSAGE_CONTENT = true;
 	
 	public MessageInjector(Map<Long, IoSession> managedSessions) {
 		cimdSessions = managedSessions;
@@ -40,11 +46,15 @@ public class MessageInjector {
 		params.add(new Parameter(Parameter.DESTINATION_ADDRESS, destination));
 		params.add(new Parameter(Parameter.ORIGINATING_ADDRESS, origin));
 		params.add(new Parameter(Parameter.MC_TIMESTAMP, new SimpleDateFormat("yyMMddHHmmss").format(new Date())));
-		params.add(new Parameter(Parameter.USER_DATA, new StringUserData(text).getBody()));
+		if(SKIP_ENCODE_MESSAGE_CONTENT)
+			params.add(new Parameter(Parameter.USER_DATA, new StringUserData(text).getBody()));
+		else
+			addMessageContent(params, text);
 		Packet p = new Packet(Packet.OP_DELIVER_MESSAGE, params.toArray(new Parameter[]{}));
 
 		for(IoSession s : sessions)
 			s.write(p);
+		logger.debug("message delivered to "+sessions.size()+" sessions");
 	}
 
 	public List<IoSession> getSessions(String uid) {
@@ -56,6 +66,20 @@ public class MessageInjector {
 				sessions.add(se.getValue());
 		}
 		return sessions;
+	}
+	
+  private static void addMessageContent(List<Parameter> params, String message) {
+		UserData[] data = TextMessageUserDataFactory.newInstance(message);
+		if(data.length > 1)
+			logger.warn("message length exceeds expected size: "+message);
+		UserData userData = data[0];
+		params.add(new Parameter(Parameter.DATA_CODING_SCHEME, userData.getDataCodingScheme()));
+		if(userData.getHeader() != null)
+			params.add(new Parameter(Parameter.USER_DATA_HEADER, userData.getHeader()));
+		if(!userData.isBodyBinary())
+			params.add(new Parameter(Parameter.USER_DATA, userData.getBody()));
+		else
+			params.add(new Parameter(Parameter.USER_DATA_BINARY, userData.getBinaryBody()));
 	}
 	
 }

@@ -13,7 +13,7 @@ import com.googlecode.jcimd.PacketSerializer;
 /**
  * A ProtocolDecoder which serializes CIMD protocol packets.
  * 
- * @author Marko Asplund
+ * @author Ixonos / Marko Asplund
  */
 public class CIMDPacketEncoder implements ProtocolEncoder {
 	private PacketSerializer serializer;

@@ -14,7 +14,7 @@ import com.googlecode.jcimd.Parameter;
 /**
  * CIMD protocol packet mock handler.
  * 
- * @author Marko Asplund
+ * @author Ixonos / Marko Asplund
  */
 public class CIMDMessageHandler extends IoHandlerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(CIMDMessageHandler.class);

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * CIMD server simulator.
  * 
- * @author Marko Asplund
+ * @author Ixonos / Marko Asplund
  */
 public class CIMDSimulator {
 	private static final Logger logger = LoggerFactory.getLogger(CIMDSimulator.class);

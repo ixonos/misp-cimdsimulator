@@ -1,0 +1,32 @@
+
+CIMD simulator is a Computer Interface to Message Distribution (CIMD, http://en.wikipedia.org/wiki/CIMD)
+protocol version 2.0 compliant server that is designed to be used for testing CIMD client applications.
+It can be used out-of-the box for functional and load testing CIMD send-only and receiving applications.
+It has been designed to be simple, light-weight, scalable and can easily be extended for other use cases and purposes.
+
+===================================
+
+building, packaging, installation
+---------------------------------
+
+pre-requisites
+--------------
+- Java SE 6 JDK
+- Apache Maven 3
+
+building
+--------
+mvn clean install
+
+packaging
+---------
+mvn assembly:single
+
+installation
+------------
+tar ztf target/cimdsimulator-0.0.1-SNAPSHOT-bin.tar.gz
+cd cimdsimulator-0.0.1-SNAPSHOT
+sh bin/simulator.sh
+
+
+===================================

@@ -1,0 +1,15 @@
+
+This software is covered by the following copyrights
+
+Copyright 2012 Ixonos Plc. All rights reserved. 
+
+
+Except where otherwise noted, this software and related works herein are
+licensed under The GNU Lesser General Public License, version 3.0.
+ 
+The license text can be found in licenses/lgpl-3.0.txt.
+
+
+GNU LGPL incorporates the terms and conditions of the GNU GPL, supplemented by
+additional permissions of the LGPL.
+GNU GPL license text can be found in licenses/gpl-3.0.txt.

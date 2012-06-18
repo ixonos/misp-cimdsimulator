@@ -20,51 +20,52 @@ import com.googlecode.jcimd.Packet;
 import com.googlecode.jcimd.PacketSerializer;
 
 /**
- * A ProtocolDecoder which deserializes CIMD protocol packets. 
+ * A ProtocolDecoder which deserializes CIMD protocol packets.
  * 
  * @author Ixonos / Marko Asplund
  */
 public class CIMDPacketDecoder extends CumulativeProtocolDecoder {
-	private PacketSerializer serializer;
+  private PacketSerializer serializer;
 
-	private enum Token {
-		STX((byte)2), ETX((byte)3);
-		private byte val;
-		private Token(byte b) {
-			val = b;
-		}
-	}
+  private enum Token {
+    STX((byte) 2), ETX((byte) 3);
+    private byte val;
 
-	public CIMDPacketDecoder(PacketSerializer serializer) {
-		this.serializer = serializer;
+    private Token(byte b) {
+      val = b;
+    }
   }
 
-	@Override
-  protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-		int start = in.position();
-		
-		while (in.hasRemaining()) {
-			byte c = in.get();
-			if (c == Token.ETX.val) {
-				int pos = in.position();
-				int lim = in.limit();
+  public CIMDPacketDecoder(PacketSerializer serializer) {
+    this.serializer = serializer;
+  }
 
-				try {
-					in.position(start);
-					in.limit(pos);
-					Packet packet = serializer.deserialize(in.slice().asInputStream());
-					out.write(packet);
-				} finally {
-					in.position(pos);
-					in.limit(lim);
-				}
-				return true;
-			}
-		}
-		
-		in.position(start);
-		
-	  return false;
+  @Override
+  protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+    int start = in.position();
+
+    while (in.hasRemaining()) {
+      byte c = in.get();
+      if (c == Token.ETX.val) {
+        int pos = in.position();
+        int lim = in.limit();
+
+        try {
+          in.position(start);
+          in.limit(pos);
+          Packet packet = serializer.deserialize(in.slice().asInputStream());
+          out.write(packet);
+        } finally {
+          in.position(pos);
+          in.limit(lim);
+        }
+        return true;
+      }
+    }
+
+    in.position(start);
+
+    return false;
   }
 
 }

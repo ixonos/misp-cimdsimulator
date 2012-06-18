@@ -21,28 +21,29 @@ import com.googlecode.jcimd.PacketSerializer;
 import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
 
 /**
- * A ProtocolCodecFactory implementation that serializes and deserializes CIMD protocol packets. 
+ * A ProtocolCodecFactory implementation that serializes and deserializes CIMD
+ * protocol packets.
  * 
  * @author Ixonos / Marko Asplund
  */
 public class CIMDCodecFactory implements ProtocolCodecFactory {
-	private CIMDPacketDecoder decoder;
-	private CIMDPacketEncoder encoder; 
+  private CIMDPacketDecoder decoder;
+  private CIMDPacketEncoder encoder;
 
-	public CIMDCodecFactory() {
-		PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
-		PacketSerializer serializer = new PacketSerializer();
-		serializer.setSequenceNumberGenerator(gen);
-		decoder = new CIMDPacketDecoder(serializer);
-		encoder = new CIMDPacketEncoder(serializer);
-	}
-	
-	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-	  return decoder;
+  public CIMDCodecFactory() {
+    PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
+    PacketSerializer serializer = new PacketSerializer();
+    serializer.setSequenceNumberGenerator(gen);
+    decoder = new CIMDPacketDecoder(serializer);
+    encoder = new CIMDPacketEncoder(serializer);
   }
 
-	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-	  return encoder;
+  public ProtocolDecoder getDecoder(IoSession session) throws Exception {
+    return decoder;
+  }
+
+  public ProtocolEncoder getEncoder(IoSession session) throws Exception {
+    return encoder;
   }
 
 }

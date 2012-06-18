@@ -25,98 +25,97 @@ import au.com.bytecode.opencsv.CSVParser;
 import com.ixonos.cimd.InvalidMessageFormatException;
 
 /**
- * Protocol handler that receives text messages in CSV format via socket and delivers them to CIMD applications.
- * Allows text messages to be injected into the CIMD server.
- * Message format
+ * Protocol handler that receives text messages in CSV format via socket and
+ * delivers them to CIMD applications. Allows text messages to be injected into
+ * the CIMD server. Message format
  * 
- * <delivery count>,<receiver uid>,<destination address>,<origin address>,<message text>
- *
+ * <delivery count>,<receiver uid>,<destination address>,<origin
+ * address>,<message text>
+ * 
  * for example:
  * 
- * 555,*,123,456,test33
- * 1000,rlu,123,456,"hello, world #%d"
+ * 555,*,123,456,test33 1000,rlu,123,456,"hello, world #%d"
  * 
  * %d in message content will be replaced with the current message count.
  * 
  * @author Ixonos / Marko Asplund
  */
 public class TextMessageHandler extends IoHandlerAdapter {
-	private static final Logger logger = LoggerFactory.getLogger(TextMessageHandler.class);
-	private MessageInjector messageInjector;
-	
-	public TextMessageHandler(Map<Long, IoSession> cimdSessions) {
-		messageInjector = new MessageInjector(cimdSessions);
+  private static final Logger logger = LoggerFactory.getLogger(TextMessageHandler.class);
+  private MessageInjector messageInjector;
+
+  public TextMessageHandler(Map<Long, IoSession> cimdSessions) {
+    messageInjector = new MessageInjector(cimdSessions);
   }
 
-	@Override
+  @Override
   public void messageReceived(IoSession session, Object message) throws Exception {
-		String msgString = (String)message;
-		logger.debug("msg: "+msgString);
-		
-		DeliveryRequest msg = DeliveryRequest.parseMessage(msgString);
-		
-		List<IoSession> receivers = messageInjector.getSessions(msg.getReceiverUid());
-		for(int i = 0; i<msg.getCount(); i++) {
-			String text = msg.getText().replaceFirst("%d", String.valueOf(i));
-			messageInjector.injectMessage(receivers, msg.getDestination(), msg.getOrigin(), text);
-		}
-	}
-	
-	private static class DeliveryRequest {
-		private static final CSVParser csvParser = new CSVParser();
-		private Integer count;
-		private String receiverUid;
-		private String destination;
-		private String origin;
-		private String text;
+    String msgString = (String) message;
+    logger.debug("msg: " + msgString);
 
-		public DeliveryRequest(Integer count, String receiverUid, String destination,
-        String origin, String text) {
-	    this.count = count;
-	    this.receiverUid = receiverUid;
-	    this.destination = destination;
-	    this.origin = origin;
-	    this.text = text;
+    DeliveryRequest msg = DeliveryRequest.parseMessage(msgString);
+
+    List<IoSession> receivers = messageInjector.getSessions(msg.getReceiverUid());
+    for (int i = 0; i < msg.getCount(); i++) {
+      String text = msg.getText().replaceFirst("%d", String.valueOf(i));
+      messageInjector.injectMessage(receivers, msg.getDestination(), msg.getOrigin(), text);
+    }
+  }
+
+  private static class DeliveryRequest {
+    private static final CSVParser csvParser = new CSVParser();
+    private Integer count;
+    private String receiverUid;
+    private String destination;
+    private String origin;
+    private String text;
+
+    public DeliveryRequest(Integer count, String receiverUid, String destination, String origin, String text) {
+      this.count = count;
+      this.receiverUid = receiverUid;
+      this.destination = destination;
+      this.origin = origin;
+      this.text = text;
     }
 
-		public static DeliveryRequest parseMessage(String msg) throws InvalidMessageFormatException {
-			String[] data = null;
-			Integer count = null;
-			try {
-				data = csvParser.parseLine(msg);
-				if(data == null || data.length != 5)
-					throw new InvalidMessageFormatException("Expecting 5 field values: "+msg);
-				if(data[1].length() == 0 || data[2].length() == 0 || data[4].length() == 0)
-					throw new InvalidMessageFormatException("Field values should be non-empty: "+msg);
-				count = Integer.valueOf(data[0]);
-				return new DeliveryRequest(count, data[1], data[2], data[3], data[4]);
-			} catch (NumberFormatException ex) {
-				throw new InvalidMessageFormatException("invalid message count: "+msg, ex);
-			} catch (IOException ex) {
-				throw new InvalidMessageFormatException("failed to parse CSV data: "+msg, ex);
+    public static DeliveryRequest parseMessage(String msg) throws InvalidMessageFormatException {
+      String[] data = null;
+      Integer count = null;
+      try {
+        data = csvParser.parseLine(msg);
+        if (data == null || data.length != 5)
+          throw new InvalidMessageFormatException("Expecting 5 field values: " + msg);
+        if (data[1].length() == 0 || data[2].length() == 0 || data[4].length() == 0)
+          throw new InvalidMessageFormatException("Field values should be non-empty: " + msg);
+        count = Integer.valueOf(data[0]);
+        return new DeliveryRequest(count, data[1], data[2], data[3], data[4]);
+      } catch (NumberFormatException ex) {
+        throw new InvalidMessageFormatException("invalid message count: " + msg, ex);
+      } catch (IOException ex) {
+        throw new InvalidMessageFormatException("failed to parse CSV data: " + msg, ex);
       }
-		}
-
-		public Integer getCount() {
-    	return count;
     }
 
-		public String getReceiverUid() {
-    	return receiverUid;
+    public Integer getCount() {
+      return count;
     }
 
-		public String getDestination() {
-    	return destination;
+    public String getReceiverUid() {
+      return receiverUid;
     }
 
-		public String getOrigin() {
-    	return origin;
+    public String getDestination() {
+      return destination;
     }
 
-		public String getText() {
-    	return text;
+    public String getOrigin() {
+      return origin;
     }
 
-	}
+    public String getText() {
+      return text;
+    }
+
+  }
 
 }

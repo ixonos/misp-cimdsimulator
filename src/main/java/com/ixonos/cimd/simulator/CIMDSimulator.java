@@ -29,45 +29,44 @@ import org.slf4j.LoggerFactory;
  * @author Ixonos / Marko Asplund
  */
 public class CIMDSimulator {
-	private static final Logger logger = LoggerFactory.getLogger(CIMDSimulator.class);
-	private IoAcceptor cimdAcceptor;
-	private int port;
-	private IoAcceptor msgAcceptor;
-	private int messagePort;
-	private static final String CHARSET = "ISO-8859-15";
+  private static final Logger logger = LoggerFactory.getLogger(CIMDSimulator.class);
+  private IoAcceptor cimdAcceptor;
+  private int port;
+  private IoAcceptor msgAcceptor;
+  private int messagePort;
+  private static final String CHARSET = "ISO-8859-15";
 
-	public CIMDSimulator(int port, int messagePort) {
-		this.port = port;
-		this.messagePort = messagePort;
-		
-		// CIMD connection acceptor.
-		cimdAcceptor = new NioSocketAcceptor();
-    cimdAcceptor.getFilterChain().addLast("logger", new LoggingFilter() );
+  public CIMDSimulator(int port, int messagePort) {
+    this.port = port;
+    this.messagePort = messagePort;
+
+    // CIMD connection acceptor.
+    cimdAcceptor = new NioSocketAcceptor();
+    cimdAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
     cimdAcceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new CIMDCodecFactory()));
-		CIMDMessageHandler handler = new CIMDMessageHandler();
-		cimdAcceptor.setHandler(handler);
-    
-		// acceptor for injecting text messages into the CIMD server.
+    CIMDMessageHandler handler = new CIMDMessageHandler();
+    cimdAcceptor.setHandler(handler);
+
+    // acceptor for injecting text messages into the CIMD server.
     msgAcceptor = new NioSocketAcceptor();
-    msgAcceptor.getFilterChain().addLast("logger", new LoggingFilter() );
+    msgAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
     msgAcceptor.getFilterChain().addLast("protocol",
-    		new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName(CHARSET))));
+        new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName(CHARSET))));
     TextMessageHandler textHandler = new TextMessageHandler(cimdAcceptor.getManagedSessions());
     msgAcceptor.setHandler(textHandler);
-	}
-	
-	public void start() throws IOException {
-		cimdAcceptor.bind(new InetSocketAddress(port));
-		msgAcceptor.bind(new InetSocketAddress(messagePort));
+  }
+
+  public void start() throws IOException {
+    cimdAcceptor.bind(new InetSocketAddress(port));
+    msgAcceptor.bind(new InetSocketAddress(messagePort));
     logger.info("running");
-	}
-	
-	
-	public static void main(String ... args) throws IOException {
-		String propBase = CIMDSimulator.class.getSimpleName().toLowerCase();
-		CIMDSimulator simu = new CIMDSimulator(Integer.getInteger(propBase+".port"),
-				Integer.getInteger(propBase+".messagePort"));
-		simu.start();
-	}
+  }
+
+  public static void main(String... args) throws IOException {
+    String propBase = CIMDSimulator.class.getSimpleName().toLowerCase();
+    CIMDSimulator simu = new CIMDSimulator(Integer.getInteger(propBase + ".port"),
+        Integer.getInteger(propBase + ".messagePort"));
+    simu.start();
+  }
 
 }

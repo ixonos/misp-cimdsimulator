@@ -30,8 +30,8 @@ mvn assembly:single
 
 installation
 ------------
-tar ztf target/cimdsimulator-0.0.1-SNAPSHOT-bin.tar.gz
-cd cimdsimulator-0.0.1-SNAPSHOT
+tar ztf target/cimdsimulator-0.6-SNAPSHOT-bin.tar.gz
+cd cimdsimulator-0.6-SNAPSHOT
 sh bin/simulator.sh
 
 

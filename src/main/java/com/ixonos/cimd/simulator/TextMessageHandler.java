@@ -34,7 +34,8 @@ import com.ixonos.cimd.InvalidMessageFormatException;
  * 
  * for example:
  * 
- * 555,*,123,456,test33 1000,rlu,123,456,"hello, world #%d"
+ * 555,*,123,456,test33
+ * 1000,rlu,123,456,"hello, world #%d"
  * 
  * %d in message content will be replaced with the current message count.
  * 
@@ -43,9 +44,11 @@ import com.ixonos.cimd.InvalidMessageFormatException;
 public class TextMessageHandler extends IoHandlerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(TextMessageHandler.class);
   private MessageInjector messageInjector;
+  private Long messageInjectSleepTimeMillis;
 
-  public TextMessageHandler(Map<Long, IoSession> cimdSessions) {
+  public TextMessageHandler(Map<Long, IoSession> cimdSessions, Long messageInjectSleepTimeMillis) {
     messageInjector = new MessageInjector(cimdSessions);
+    this.messageInjectSleepTimeMillis = messageInjectSleepTimeMillis;
   }
 
   @Override
@@ -57,6 +60,8 @@ public class TextMessageHandler extends IoHandlerAdapter {
 
     List<IoSession> receivers = messageInjector.getSessions(msg.getReceiverUid());
     for (int i = 0; i < msg.getCount(); i++) {
+      if(messageInjectSleepTimeMillis != null)
+        Thread.sleep(messageInjectSleepTimeMillis);
       String text = msg.getText().replaceFirst("%d", String.valueOf(i));
       messageInjector.injectMessage(receivers, msg.getDestination(), msg.getOrigin(), text);
     }

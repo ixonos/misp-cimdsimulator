@@ -36,7 +36,7 @@ public class CIMDSimulator {
   private int messagePort;
   private static final String CHARSET = "ISO-8859-15";
 
-  public CIMDSimulator(int port, int messagePort) {
+  public CIMDSimulator(int port, int messagePort, long messageInjectSleepTimeMillis) {
     this.port = port;
     this.messagePort = messagePort;
 
@@ -52,7 +52,8 @@ public class CIMDSimulator {
     msgAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
     msgAcceptor.getFilterChain().addLast("protocol",
         new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName(CHARSET))));
-    TextMessageHandler textHandler = new TextMessageHandler(cimdAcceptor.getManagedSessions());
+    TextMessageHandler textHandler = new TextMessageHandler(cimdAcceptor.getManagedSessions(),
+        messageInjectSleepTimeMillis);
     msgAcceptor.setHandler(textHandler);
   }
 
@@ -65,7 +66,8 @@ public class CIMDSimulator {
   public static void main(String... args) throws IOException {
     String propBase = CIMDSimulator.class.getSimpleName().toLowerCase();
     CIMDSimulator simu = new CIMDSimulator(Integer.getInteger(propBase + ".port"),
-        Integer.getInteger(propBase + ".messagePort"));
+        Integer.getInteger(propBase + ".messagePort"),
+        Long.getLong(propBase + ".messageInjectSleepTimeMillis"));
     simu.start();
   }
 

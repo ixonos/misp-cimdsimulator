@@ -35,10 +35,12 @@ public class CIMDSimulator {
   private IoAcceptor msgAcceptor;
   private int messagePort;
   private static final String CHARSET = "ISO-8859-15";
+  private long messageInjectSleepTimeMillis;
 
   public CIMDSimulator(int port, int messagePort, long messageInjectSleepTimeMillis) {
     this.port = port;
     this.messagePort = messagePort;
+    this.messageInjectSleepTimeMillis = messageInjectSleepTimeMillis;
 
     // CIMD connection acceptor.
     cimdAcceptor = new NioSocketAcceptor();

@@ -32,7 +32,7 @@ public class CIMDCodecFactory implements ProtocolCodecFactory {
 
   public CIMDCodecFactory() {
     PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
-    PacketSerializer serializer = new PacketSerializer("ser", false);
+    PacketSerializer serializer = new PacketSerializer("ser", true);
     serializer.setSequenceNumberGenerator(gen);
     decoder = new CIMDPacketDecoder(serializer);
     encoder = new CIMDPacketEncoder(serializer);

@@ -32,7 +32,16 @@ installation
 ------------
 tar ztf target/cimdsimulator-0.6-SNAPSHOT-bin.tar.gz
 cd cimdsimulator-0.6-SNAPSHOT
+
+
+usage
+-----
+# startup
 sh bin/simulator.sh
 
+# injecting a message
+telnet localhost 9072
+1,*,123,456,test33 1000,rlu,123,456,"hello, world #%d"
 
 ===================================
+

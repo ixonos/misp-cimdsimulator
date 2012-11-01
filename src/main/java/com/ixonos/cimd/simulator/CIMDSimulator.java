@@ -36,7 +36,7 @@ public class CIMDSimulator {
   private int messagePort;
   private static final String CHARSET = "ISO-8859-15";
 
-  public CIMDSimulator(int port, int messagePort, long messageInjectSleepTimeMillis) {
+  public CIMDSimulator(int port, int messagePort, Long messageInjectSleepTimeMillis) {
     this.port = port;
     this.messagePort = messagePort;
 
@@ -65,9 +65,11 @@ public class CIMDSimulator {
 
   public static void main(String... args) throws IOException {
     String propBase = CIMDSimulator.class.getSimpleName().toLowerCase();
-    CIMDSimulator simu = new CIMDSimulator(Integer.getInteger(propBase + ".port"),
-        Integer.getInteger(propBase + ".messagePort"),
-        Long.getLong(propBase + ".messageInjectSleepTimeMillis"));
+    Integer port = Integer.getInteger(propBase + ".port");
+    Integer msgPort = Integer.getInteger(propBase + ".messagePort");
+    Long messageInjectSleepTimeMillis = Long.getLong(propBase + ".messageInjectSleepTimeMillis");
+    logger.info(String.format("starting with parameters: %d, %d, %d", port, msgPort, messageInjectSleepTimeMillis));
+    CIMDSimulator simu = new CIMDSimulator(port, msgPort, messageInjectSleepTimeMillis);
     simu.start();
   }
 

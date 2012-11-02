@@ -20,7 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.jcimd.Packet;
+import com.googlecode.jcimd.PacketSequenceNumberGenerator;
+import com.googlecode.jcimd.PacketSerializer;
 import com.googlecode.jcimd.Parameter;
+import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
 
 /**
  * CIMD protocol packet mock handler.
@@ -29,7 +32,13 @@ import com.googlecode.jcimd.Parameter;
  */
 public class CIMDMessageHandler extends IoHandlerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(CIMDMessageHandler.class);
+  private boolean useCimdCheckSum;
 
+  public CIMDMessageHandler(boolean useCimdCheckSum) {
+    super();
+    this.useCimdCheckSum = useCimdCheckSum;
+  }
+  
   @Override
   public void messageReceived(IoSession session, Object msg) throws Exception {
     Packet req = (Packet) msg;
@@ -70,6 +79,19 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
     }
 
     session.write(res); // write response Packet
+  }
+
+  @Override
+  public void sessionCreated(IoSession session) throws Exception {
+    super.sessionCreated(session);
+    logger.debug("session created: "+session.getId());
+
+    // instantiate CIMD packet codec and store it in session
+    PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
+    PacketSerializer ser = new PacketSerializer("ser", useCimdCheckSum);
+    ser.setSequenceNumberGenerator(gen);
+    session.setAttribute(SessionAttribute.CIMD_ENCODER, new CIMDPacketEncoder(ser));
+    session.setAttribute(SessionAttribute.CIMD_DECODER, new CIMDPacketDecoder(ser));
   }
 
   @Override

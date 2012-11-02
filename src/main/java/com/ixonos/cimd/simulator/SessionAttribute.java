@@ -12,5 +12,5 @@
 package com.ixonos.cimd.simulator;
 
 public enum SessionAttribute {
-  USER_ID
+  USER_ID, CIMD_ENCODER, CIMD_DECODER
 }

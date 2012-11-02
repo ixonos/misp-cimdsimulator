@@ -39,12 +39,13 @@ public class CIMDSimulator {
   public CIMDSimulator(int port, int messagePort, Long messageInjectSleepTimeMillis) {
     this.port = port;
     this.messagePort = messagePort;
+    boolean useCimdCheckSum = false; // FIXME: make configurable
 
     // CIMD connection acceptor.
     cimdAcceptor = new NioSocketAcceptor();
     cimdAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
     cimdAcceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new CIMDCodecFactory()));
-    CIMDMessageHandler handler = new CIMDMessageHandler();
+    CIMDMessageHandler handler = new CIMDMessageHandler(useCimdCheckSum);
     cimdAcceptor.setHandler(handler);
 
     // acceptor for injecting text messages into the CIMD server.

@@ -15,10 +15,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
-
-import com.googlecode.jcimd.PacketSequenceNumberGenerator;
-import com.googlecode.jcimd.PacketSerializer;
-import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A ProtocolCodecFactory implementation that serializes and deserializes CIMD
@@ -27,23 +25,20 @@ import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
  * @author Ixonos / Marko Asplund
  */
 public class CIMDCodecFactory implements ProtocolCodecFactory {
-  private CIMDPacketDecoder decoder;
-  private CIMDPacketEncoder encoder;
+  @SuppressWarnings("unused")
+  private static final Logger logger = LoggerFactory.getLogger(CIMDCodecFactory.class);
 
   public CIMDCodecFactory() {
-    PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
-    PacketSerializer serializer = new PacketSerializer("ser", true);
-    serializer.setSequenceNumberGenerator(gen);
-    decoder = new CIMDPacketDecoder(serializer);
-    encoder = new CIMDPacketEncoder(serializer);
   }
 
   public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-    return decoder;
+    CIMDPacketDecoder dec = (CIMDPacketDecoder) session.getAttribute(SessionAttribute.CIMD_DECODER);
+    return dec;
   }
 
   public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-    return encoder;
+    CIMDPacketEncoder enc = (CIMDPacketEncoder) session.getAttribute(SessionAttribute.CIMD_ENCODER);
+    return enc;
   }
 
 }

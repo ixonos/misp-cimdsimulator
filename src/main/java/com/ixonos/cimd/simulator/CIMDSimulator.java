@@ -39,7 +39,7 @@ public class CIMDSimulator {
   public CIMDSimulator(int port, int messagePort, Long messageInjectSleepTimeMillis) {
     this.port = port;
     this.messagePort = messagePort;
-    boolean useCimdCheckSum = false; // FIXME: make configurable
+    boolean useCimdCheckSum = true; // FIXME: make configurable
 
     // CIMD connection acceptor.
     cimdAcceptor = new NioSocketAcceptor();
@@ -63,6 +63,13 @@ public class CIMDSimulator {
     msgAcceptor.bind(new InetSocketAddress(messagePort));
     logger.info("running");
   }
+  
+  public void stop() {
+    msgAcceptor.unbind();
+    cimdAcceptor.unbind();
+    logger.info("shut down");
+  }
+  
 
   public static void main(String... args) throws IOException {
     String propBase = CIMDSimulator.class.getSimpleName().toLowerCase();

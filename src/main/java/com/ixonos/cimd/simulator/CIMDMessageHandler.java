@@ -58,23 +58,37 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
       }
       break;
     case Packet.OP_LOGOUT:
-      // logger.info("Ending session with " + session.getRemoteAddress());
+      res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber());
+      session.write(res);
       session.close(false);
       break;
-    case CIMDConstants.OP_DELIVER_MESSAGE_RSP:
-      return;
+    case Packet.OP_SUBMIT_MESSAGE:
+      // message from application to SMSC
+      Parameter dest = null;
+      for(Parameter pr : req.getParameters()) {
+        if(Parameter.DESTINATION_ADDRESS == pr.getNumber())
+          dest = pr;
+          break;
+      }
+      if(dest != null) {
+        logger.error("destination parameter missing: "+req);
+        return;
+      }
+      res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber(), dest,
+          new Parameter(60, new SimpleDateFormat("yyMMddHHmmss").format(new Date())));
+      break;
     case Packet.OP_ALIVE:
       res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber());
       break;
     case Packet.OP_DELIVER_MESSAGE:
       res = null;
       break;
-    case Packet.OP_SUBMIT_MESSAGE:
-      res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber(), new Parameter(60,
-          new SimpleDateFormat("yyMMddHHmmss").format(new Date())));
-      break;
+    case CIMDConstants.OP_DELIVER_MESSAGE_RSP:
+      // positive response to "deliver message" - msg from SMSC to app
+      return;
     default:
       res = new Packet(Packet.OP_GENERAL_ERROR_RESPONSE);
+      logger.error("no handler for CIMD operation: "+req);
       break;
     }
 

@@ -66,7 +66,6 @@ public class MessageInjector {
 
     for (IoSession s : sessions)
       s.write(p);
-    logger.debug("message delivered to " + sessions.size() + " sessions");
   }
 
   public List<IoSession> getSessions(String uid) {

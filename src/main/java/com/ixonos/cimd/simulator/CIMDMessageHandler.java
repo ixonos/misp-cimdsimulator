@@ -53,6 +53,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
       for (Parameter p : req.getParameters()) {
         if (p.getNumber() == Parameter.USER_IDENTITY) {
           session.setAttributeIfAbsent(SessionAttribute.USER_ID, p.getValue());
+          logger.debug("session "+session.getId()+": user: "+p.getValue());
           break;
         }
       }

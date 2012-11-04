@@ -59,12 +59,17 @@ public class TextMessageHandler extends IoHandlerAdapter {
     DeliveryRequest msg = DeliveryRequest.parseMessage(msgString);
 
     List<IoSession> receivers = messageInjector.getSessions(msg.getReceiverUid());
+    if(receivers.size() == 0) {
+      logger.warn("no receivers found for message");
+      return;
+    }
     for (int i = 0; i < msg.getCount(); i++) {
       if(messageInjectSleepTimeMillis != null)
         Thread.sleep(messageInjectSleepTimeMillis);
       String text = msg.getText().replaceFirst("%d", String.valueOf(i));
       messageInjector.injectMessage(receivers, msg.getDestination(), msg.getOrigin(), text);
     }
+    logger.debug(String.format("%d messages injected to %d sessions", msg.getCount(), receivers.size()));
   }
 
   private static class DeliveryRequest {

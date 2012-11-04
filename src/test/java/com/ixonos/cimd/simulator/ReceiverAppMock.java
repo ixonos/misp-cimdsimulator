@@ -75,16 +75,28 @@ public class ReceiverAppMock {
 
   public void start() throws Exception {
     logger.debug("start: "+uid);
+    Packet deliveryResp = new Packet(Packet.OP_DELIVER_MESSAGE + 50);
+    Packet submit = new Packet(Packet.OP_SUBMIT_MESSAGE,
+        new Parameter(Parameter.DESTINATION_ADDRESS, 123),
+        new Parameter(Parameter.USER_DATA, "hello, world ("+uid+")"));
+    
     int pn = phaser.arriveAndAwaitAdvance();
     logger.debug("starting receiver: "+uid+", "+pn);
     // listen for messages
     while(messageCount.get() < maxMessages) {
       Packet p = cimdSerializer.deserialize(socket.getInputStream());
+
       if(p.getOperationCode() == Packet.OP_DELIVER_MESSAGE && getDeliveredMessage(p).contains(msgMatch)) {
         messageCount.addAndGet(1);
       }
-      if(messageCount.get()%1000==0)
+      // send occasional messages to SMSC to make communication two-way
+      if(messageCount.get() % 1000 == 0) {
         logger.debug(String.format("%s: messages: %d (max: %d)", uid, messageCount.get(), maxMessages));
+        cimdSerializer.serialize(deliveryResp, socket.getOutputStream());
+      }
+      if(messageCount.get() % 2000 == 0) {
+        cimdSerializer.serialize(submit, socket.getOutputStream());
+      }
     }
     logger.debug("stopping: "+uid+": "+messageCount);
   }

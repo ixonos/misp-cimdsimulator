@@ -71,7 +71,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
           dest = pr;
           break;
       }
-      if(dest != null) {
+      if(dest == null) {
         logger.error("destination parameter missing: "+req);
         return;
       }

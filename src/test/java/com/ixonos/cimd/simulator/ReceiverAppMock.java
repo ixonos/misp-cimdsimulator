@@ -123,5 +123,9 @@ public class ReceiverAppMock {
   public String getUid() {
     return uid;
   }
+  
+  public String getMessageMatch() {
+    return msgMatch;
+  }
 
 }

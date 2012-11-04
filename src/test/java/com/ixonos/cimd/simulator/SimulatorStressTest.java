@@ -25,7 +25,7 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-//import static org.junit.Assert.*;
+import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,14 +39,15 @@ public class SimulatorStressTest {
   private String host = "127.0.0.1";
   private int cimdPort = 9071;
   private int msgPort = 9072;
-  private int shutdownWaitTime = 90; // seconds
+  private int shutdownWaitTime = 500; // seconds
 
   private ExecutorService executorService;
 
   @Test
   public void doStressTest() throws Exception {
     int numClients = 10;
-    int numMessages = 30000;
+    int numMessages = 300000;
+    int batchSize = 1000;
     executorService = Executors.newFixedThreadPool(numClients);
     
     Phaser phaser = new Phaser(numClients+1);
@@ -55,28 +56,39 @@ public class SimulatorStressTest {
     CIMDSimulator sim = new CIMDSimulator(cimdPort, msgPort, null);
     sim.start();
     
+    // setup CIMD application mocks
     List<ReceiverAppMock> receivers = new ArrayList<ReceiverAppMock>(numClients);
     Collection<Callable<Integer>> tasks = new ArrayList<Callable<Integer>>(numClients);
     StringBuilder messages = new StringBuilder();
     List<Integer> expectedCounts = new ArrayList<Integer>(numClients);
     for(int i = 0; i < numClients; i++) {
       String messageMatch = String.format("hello %s:", "user"+i);
-      int expectedMessages = numMessages-(i*3);
+      expectedCounts.add(numMessages-(i*3));
       ReceiverAppMock r = new ReceiverAppMock(host, cimdPort, "user"+i, "pwd"+i, phaser,
-          messageMatch, expectedMessages);
+          messageMatch, expectedCounts.get(expectedCounts.size()-1));
       receivers.add(r);
       r.connect();
       tasks.add(new CIMDReceiverCallable(r));
-      messages.append(String.format("%d,%s,111,222,%s\n", expectedMessages, "user"+i, messageMatch+"%d"));
-      expectedCounts.add(expectedMessages);
     }
 
+    // construct messages and deliver them in batches
+    for(int sent = 0; sent < numMessages; sent = sent + batchSize) {
+      for(int i = 0; i < numClients; i++) {
+        int rem = expectedCounts.get(i) - sent;
+        int send = rem > batchSize ? batchSize : rem;
+        messages.append(String.format("%d,%s,111,222,%s\n", send, "user"+i,
+            receivers.get(i).getMessageMatch()+"%d"));
+      }
+    }
+    
     logger.info("starting apps");
     List<Future<Integer>> results = new ArrayList<Future<Integer>>(numClients);
     for(Callable<Integer> t : tasks)
       results.add(executorService.submit(t));
 
+    // try to make sure the CIMD client sessions are ready (logged in etc.)
     phaser.arriveAndAwaitAdvance();
+    Thread.sleep(1000);
     logger.info("sending messages to CIMD simulator: ");
     logger.info("messages: "+messages.toString());
     Socket s = new Socket(host, msgPort);
@@ -87,7 +99,10 @@ public class SimulatorStressTest {
     // wait for the receiver apps to finish
     logger.info("starting receiver app shutdown, waiting for "+shutdownWaitTime+"s");
     executorService.shutdown();
-    executorService.awaitTermination(shutdownWaitTime, TimeUnit.SECONDS);
+    if(!executorService.awaitTermination(shutdownWaitTime, TimeUnit.SECONDS)) {
+      s.close();
+      throw new RuntimeException("CIMD clients terminated due to timeout, test failed!");
+    }
     logger.info("finished receiver app shutdown");
 
     s.close();
@@ -99,7 +114,7 @@ public class SimulatorStressTest {
       logger.info(String.format("receiver: %s: isDone: %b, messages: %d, expected: %d", a.getUid(),
           r.isDone(), a.getMessageCount(), expectedCounts.get(i)));
       receivers.get(i).disconnect();
-//      assertEquals(expectedCounts.get(i), a.getMessageCount());
+      assertEquals(expectedCounts.get(i), a.getMessageCount());
     }
 
     sim.stop();

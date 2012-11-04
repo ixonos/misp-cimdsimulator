@@ -60,7 +60,7 @@ public class TextMessageHandler extends IoHandlerAdapter {
 
     List<IoSession> receivers = messageInjector.getSessions(msg.getReceiverUid());
     if(receivers.size() == 0) {
-      logger.warn("no receivers found for message");
+      logger.warn("no receivers found: "+msg.getReceiverUid());
       return;
     }
     for (int i = 0; i < msg.getCount(); i++) {

@@ -36,10 +36,9 @@ public class CIMDSimulator {
   private int messagePort;
   private static final String CHARSET = "ISO-8859-15";
 
-  public CIMDSimulator(int port, int messagePort, Long messageInjectSleepTimeMillis) {
+  public CIMDSimulator(int port, int messagePort, boolean useCimdCheckSum, Long messageInjectSleepTimeMillis) {
     this.port = port;
     this.messagePort = messagePort;
-    boolean useCimdCheckSum = true; // FIXME: make configurable
 
     // CIMD connection acceptor.
     cimdAcceptor = new NioSocketAcceptor();
@@ -72,12 +71,19 @@ public class CIMDSimulator {
   
 
   public static void main(String... args) throws IOException {
+    // read configuration parameters
     String propBase = CIMDSimulator.class.getSimpleName().toLowerCase();
     Integer port = Integer.getInteger(propBase + ".port");
     Integer msgPort = Integer.getInteger(propBase + ".messagePort");
     Long messageInjectSleepTimeMillis = Long.getLong(propBase + ".messageInjectSleepTimeMillis");
-    logger.info(String.format("starting with parameters: %d, %d, %d", port, msgPort, messageInjectSleepTimeMillis));
-    CIMDSimulator simu = new CIMDSimulator(port, msgPort, messageInjectSleepTimeMillis);
+    boolean useCimdCheckSum = true;
+    String useCimdCheckSumStr = System.getProperty(propBase+".useCimdCheckSum");
+    if(useCimdCheckSumStr != null)
+      useCimdCheckSum = Boolean.valueOf(useCimdCheckSumStr);
+
+    logger.info(String.format("starting with parameters: %d, %d, %b, %d", port, msgPort, useCimdCheckSum,
+        messageInjectSleepTimeMillis));
+    CIMDSimulator simu = new CIMDSimulator(port, msgPort, useCimdCheckSum, messageInjectSleepTimeMillis);
     simu.start();
   }
 

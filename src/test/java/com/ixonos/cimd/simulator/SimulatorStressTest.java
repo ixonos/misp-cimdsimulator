@@ -53,7 +53,7 @@ public class SimulatorStressTest {
     Phaser phaser = new Phaser(numClients+1);
 
     // start simulator
-    CIMDSimulator sim = new CIMDSimulator(cimdPort, msgPort, null);
+    CIMDSimulator sim = new CIMDSimulator(cimdPort, msgPort, true, null);
     sim.start();
     
     // setup CIMD application mocks

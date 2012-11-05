@@ -19,11 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.jcimd.ApplicationPacketSequenceNumberGenerator;
 import com.googlecode.jcimd.Packet;
 import com.googlecode.jcimd.PacketSequenceNumberGenerator;
 import com.googlecode.jcimd.PacketSerializer;
 import com.googlecode.jcimd.Parameter;
-import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
 import com.ixonos.cimd.ContingencyException;
 
 /**
@@ -53,7 +53,7 @@ public class ReceiverAppMock {
     this.msgMatch = msgMatch; 
     this.maxMessages = maxMessages;
     
-    PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
+    PacketSequenceNumberGenerator gen = new ApplicationPacketSequenceNumberGenerator();
     cimdSerializer = new PacketSerializer("ser");
     cimdSerializer.setSequenceNumberGenerator(gen);
   }
@@ -75,7 +75,7 @@ public class ReceiverAppMock {
 
   public void start() throws Exception {
     logger.debug("start: "+uid);
-    Packet deliveryResp = new Packet(Packet.OP_DELIVER_MESSAGE + 50);
+     
     Packet submit = new Packet(Packet.OP_SUBMIT_MESSAGE,
         new Parameter(Parameter.DESTINATION_ADDRESS, 123),
         new Parameter(Parameter.USER_DATA, "hello, world ("+uid+")"));
@@ -92,7 +92,7 @@ public class ReceiverAppMock {
       // send occasional messages to SMSC to make communication two-way
       if(messageCount.get() % 1000 == 0) {
         logger.debug(String.format("%s: messages: %d (max: %d)", uid, messageCount.get(), maxMessages));
-        cimdSerializer.serialize(deliveryResp, socket.getOutputStream());
+        cimdSerializer.serialize(new Packet(Packet.OP_DELIVER_MESSAGE + 50, p.getSequenceNumber()), socket.getOutputStream());
       }
       if(messageCount.get() % 2000 == 0) {
         cimdSerializer.serialize(submit, socket.getOutputStream());

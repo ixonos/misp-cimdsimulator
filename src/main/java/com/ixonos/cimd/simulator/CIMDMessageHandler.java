@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.jcimd.Packet;
-import com.googlecode.jcimd.PacketSequenceNumberGenerator;
-import com.googlecode.jcimd.PacketSerializer;
 import com.googlecode.jcimd.Parameter;
 import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
 
@@ -32,11 +30,9 @@ import com.googlecode.jcimd.SmsCenterPacketSequenceNumberGenerator;
  */
 public class CIMDMessageHandler extends IoHandlerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(CIMDMessageHandler.class);
-  private boolean useCimdCheckSum;
 
-  public CIMDMessageHandler(boolean useCimdCheckSum) {
+  public CIMDMessageHandler() {
     super();
-    this.useCimdCheckSum = useCimdCheckSum;
   }
   
   @Override
@@ -52,7 +48,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
       res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber());
       for (Parameter p : req.getParameters()) {
         if (p.getNumber() == Parameter.USER_IDENTITY) {
-          session.setAttributeIfAbsent(SessionAttribute.USER_ID, p.getValue());
+          SessionUtils.setUserId(session, p.getValue());
           logger.debug("session "+session.getId()+": user: "+p.getValue());
           break;
         }
@@ -101,12 +97,8 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
     super.sessionCreated(session);
     logger.debug("session created: "+session.getId());
 
-    // instantiate CIMD packet codec and store it in session
-    PacketSequenceNumberGenerator gen = new SmsCenterPacketSequenceNumberGenerator();
-    PacketSerializer ser = new PacketSerializer("ser", useCimdCheckSum);
-    ser.setSequenceNumberGenerator(gen);
-    session.setAttribute(SessionAttribute.CIMD_ENCODER, new CIMDPacketEncoder(ser));
-    session.setAttribute(SessionAttribute.CIMD_DECODER, new CIMDPacketDecoder(ser));
+    // instantiate packet sequence number generator and store it in session
+    SessionUtils.setPacketSequenceNumberGenerator(session, new SmsCenterPacketSequenceNumberGenerator());
   }
 
   @Override

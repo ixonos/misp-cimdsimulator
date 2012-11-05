@@ -25,7 +25,7 @@ import com.googlecode.jcimd.PacketSerializer;
  * @author Ixonos / Marko Asplund
  */
 public class CIMDPacketDecoder extends CumulativeProtocolDecoder {
-  private PacketSerializer serializer;
+  private boolean useChecksum;
 
   private enum Token {
     STX((byte) 2), ETX((byte) 3);
@@ -36,8 +36,8 @@ public class CIMDPacketDecoder extends CumulativeProtocolDecoder {
     }
   }
 
-  public CIMDPacketDecoder(PacketSerializer serializer) {
-    this.serializer = serializer;
+  public CIMDPacketDecoder(boolean useChecksum) {
+    this.useChecksum = useChecksum;
   }
 
   @Override
@@ -53,7 +53,7 @@ public class CIMDPacketDecoder extends CumulativeProtocolDecoder {
         try {
           in.position(start);
           in.limit(pos);
-          Packet packet = serializer.deserialize(in.slice().asInputStream());
+          Packet packet = PacketSerializer.deserializePacket(in.slice().asInputStream(), useChecksum);
           out.write(packet);
         } finally {
           in.position(pos);

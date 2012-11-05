@@ -27,10 +27,10 @@ import com.googlecode.jcimd.PacketSerializer;
  * @author Ixonos / Marko Asplund
  */
 public class CIMDPacketEncoder implements ProtocolEncoder {
-  private PacketSerializer serializer;
+  private boolean useChecksum;
 
-  public CIMDPacketEncoder(PacketSerializer serializer) {
-    this.serializer = serializer;
+  public CIMDPacketEncoder(boolean useChecksum) {
+    this.useChecksum = useChecksum;
   }
 
   public void dispose(IoSession session) throws Exception {
@@ -39,7 +39,7 @@ public class CIMDPacketEncoder implements ProtocolEncoder {
   public void encode(IoSession session, Object msg, ProtocolEncoderOutput out) throws Exception {
     Packet packet = (Packet) msg;
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    serializer.serialize(packet, os);
+    PacketSerializer.serializePacket(packet, SessionUtils.getPacketSequenceNumberGenerator(session), useChecksum, os);
     IoBuffer buf = IoBuffer.allocate(os.size());
     buf.put(os.toByteArray());
     buf.flip();

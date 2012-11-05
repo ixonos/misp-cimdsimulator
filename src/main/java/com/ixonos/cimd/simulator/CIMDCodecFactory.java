@@ -27,18 +27,18 @@ import org.slf4j.LoggerFactory;
 public class CIMDCodecFactory implements ProtocolCodecFactory {
   @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(CIMDCodecFactory.class);
+  private boolean useChecksum;
 
-  public CIMDCodecFactory() {
+  public CIMDCodecFactory(boolean useChecksum) {
+    this.useChecksum = useChecksum;
   }
 
   public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-    CIMDPacketDecoder dec = (CIMDPacketDecoder) session.getAttribute(SessionAttribute.CIMD_DECODER);
-    return dec;
+    return new CIMDPacketDecoder(useChecksum);
   }
 
   public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-    CIMDPacketEncoder enc = (CIMDPacketEncoder) session.getAttribute(SessionAttribute.CIMD_ENCODER);
-    return enc;
+    return new CIMDPacketEncoder(useChecksum);
   }
 
 }

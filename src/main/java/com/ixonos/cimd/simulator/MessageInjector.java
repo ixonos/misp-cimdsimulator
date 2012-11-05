@@ -72,7 +72,7 @@ public class MessageInjector {
     List<IoSession> sessions = new ArrayList<IoSession>();
 
     for (Map.Entry<Long, IoSession> se : cimdSessions.entrySet()) {
-      String sessionUserId = (String) se.getValue().getAttribute(SessionAttribute.USER_ID);
+      String sessionUserId = SessionUtils.getUserId(se.getValue());
       if ("*".equals(uid) || uid.equals(sessionUserId))
         sessions.add(se.getValue());
     }

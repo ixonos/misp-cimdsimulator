@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>com.googlecode.jcimd</groupId>
 			<artifactId>jcimd</artifactId>
-			<version>0.5.3</version>
+			<version>0.5.4</version>
 			<scope>compile</scope>
 		</dependency>  
 

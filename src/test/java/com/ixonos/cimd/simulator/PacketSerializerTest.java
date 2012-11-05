@@ -6,6 +6,7 @@ import java.io.InputStream;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import com.googlecode.jcimd.Packet;
 import com.googlecode.jcimd.PacketSerializer;
@@ -18,6 +19,7 @@ public class PacketSerializerTest {
   public void deserialize() throws Exception {
     PacketSerializer d = new PacketSerializer("ser", false);
     Packet p = d.deserialize(getPacketAsStream(data1));
+    assertNotNull(p);
   }
 
   private static InputStream getPacketAsStream(String packet) throws DecoderException {

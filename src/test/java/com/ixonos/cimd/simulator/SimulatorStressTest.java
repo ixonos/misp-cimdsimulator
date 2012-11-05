@@ -45,8 +45,9 @@ public class SimulatorStressTest {
 
   @Test
   public void doStressTest() throws Exception {
+    System.out.println("starting stress test, this will take a while (~30 seconds)");
     int numClients = 10;
-    int numMessages = 300000;
+    int numMessages = 30000;
     int batchSize = 1000;
     executorService = Executors.newFixedThreadPool(numClients);
     

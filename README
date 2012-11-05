@@ -19,9 +19,14 @@ pre-requisites
 --------------
 - Java SE 6 JDK
 - Apache Maven 3
+- jcimd
+  git clone https://github.com/ixonos/jcimd
+  cd jcimd
+  mvn clean install
 
 building
 --------
+# NB: build and install jcimd before this.
 mvn clean install
 
 packaging

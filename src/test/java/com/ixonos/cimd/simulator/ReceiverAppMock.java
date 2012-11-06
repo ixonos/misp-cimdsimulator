@@ -85,18 +85,20 @@ public class ReceiverAppMock {
     // listen for messages
     while(messageCount.get() < maxMessages) {
       Packet p = cimdSerializer.deserialize(socket.getInputStream());
+      logger.debug(String.format("msg: %s: %s", uid, p.toString()));
 
       if(p.getOperationCode() == Packet.OP_DELIVER_MESSAGE && getDeliveredMessage(p).contains(msgMatch)) {
         messageCount.addAndGet(1);
+
+        // send occasional messages to SMSC to make communication two-way
+        if(messageCount.get() % 500 == 0) {
+          logger.debug(String.format("%s: messages: %d (max: %d)", uid, messageCount.get(), maxMessages));
+          cimdSerializer.serialize(new Packet(Packet.OP_DELIVER_MESSAGE + 50, p.getSequenceNumber()), socket.getOutputStream());
+
+          cimdSerializer.serialize(submit, socket.getOutputStream());
+        }
       }
-      // send occasional messages to SMSC to make communication two-way
-      if(messageCount.get() % 1000 == 0) {
-        logger.debug(String.format("%s: messages: %d (max: %d)", uid, messageCount.get(), maxMessages));
-        cimdSerializer.serialize(new Packet(Packet.OP_DELIVER_MESSAGE + 50, p.getSequenceNumber()), socket.getOutputStream());
-      }
-      if(messageCount.get() % 2000 == 0) {
-        cimdSerializer.serialize(submit, socket.getOutputStream());
-      }
+
     }
     logger.debug("stopping: "+uid+": "+messageCount);
   }

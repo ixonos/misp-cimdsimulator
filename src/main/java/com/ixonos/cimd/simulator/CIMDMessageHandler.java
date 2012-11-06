@@ -77,11 +77,11 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
     case Packet.OP_ALIVE:
       res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber());
       break;
-    case Packet.OP_DELIVER_MESSAGE:
-      res = null;
-      break;
     case CIMDConstants.OP_DELIVER_MESSAGE_RSP:
       // positive response to "deliver message" - msg from SMSC to app
+      return;
+    case Packet.OP_NACK:
+      logger.error("operation rejected by application");
       return;
     default:
       res = new Packet(Packet.OP_GENERAL_ERROR_RESPONSE);

@@ -17,7 +17,7 @@ building, packaging, installation
 
 pre-requisites
 --------------
-- Java SE 6 JDK
+- Java SE 7 JDK
 - Apache Maven 3
 - jcimd
   git clone https://github.com/ixonos/jcimd
@@ -35,8 +35,8 @@ mvn assembly:single
 
 installation
 ------------
-tar ztf target/cimdsimulator-0.6-SNAPSHOT-bin.tar.gz
-cd cimdsimulator-0.6-SNAPSHOT
+tar ztf target/cimdsimulator-0.7-SNAPSHOT-bin.tar.gz
+cd cimdsimulator-0.7-SNAPSHOT
 
 
 usage

@@ -73,6 +73,8 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
         logger.error("destination parameter missing: "+req);
         return;
       }
+      logger.debug("received message from app:");
+      logger.debug(cp.getUserData());
       res = new Packet(req.getOperationCode() + 50, req.getSequenceNumber(),
         new Parameter(Parameter.DESTINATION_ADDRESS, cp.getDestinationAddress()),
         new Parameter(Parameter.MC_TIMESTAMP, new SimpleDateFormat("yyMMddHHmmss").format(new Date())));
@@ -121,6 +123,7 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
 
     private void parsePacket(Packet p) {
       Integer dataCodingScheme = null;
+      String userDataBinary = null;
       for(Parameter pr : p.getParameters()) {
         switch (pr.getNumber()) {
           case Parameter.DESTINATION_ADDRESS:
@@ -133,9 +136,10 @@ public class CIMDMessageHandler extends IoHandlerAdapter {
             userData = pr.getValue();
             break;
           case Parameter.USER_DATA_BINARY:
-            userData = decodeUserDataBinary(dataCodingScheme, pr.getValue());
+            userDataBinary = pr.getValue();
         }
       }
+      userData = decodeUserDataBinary(dataCodingScheme, userDataBinary);
     }
 
     private String decodeUserDataBinary(Integer dataCodingScheme, String userDataBinary) {
